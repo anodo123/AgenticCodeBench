@@ -1,0 +1,109 @@
+{
+  "id": "005_agent_loop",
+  "name": "Bounded agent loop",
+  "description": "Bounded agent loop.",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Start with 100. First add 20. Wait for that tool result, then multiply the returned value by 3. Wait for that tool result, then subtract 10. Use exactly one tool per step, never calculate an operation yourself, and after the final tool result respond without calling another tool."
+    }
+  ],
+  "tools": [
+    {
+      "name": "add_numbers",
+      "description": "Add numbers.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "left": {
+            "type": "number"
+          },
+          "right": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "left",
+          "right"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "multiply_numbers",
+      "description": "Multiply numbers.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "left": {
+            "type": "number"
+          },
+          "right": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "left",
+          "right"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "subtract_numbers",
+      "description": "Subtract numbers.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "left": {
+            "type": "number"
+          },
+          "right": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "left",
+          "right"
+        ],
+        "additionalProperties": false
+      }
+    }
+  ],
+  "expected": {
+    "steps": [
+      {
+        "tool": "add_numbers",
+        "arguments": {
+          "left": 100,
+          "right": 20
+        },
+        "result": 120
+      },
+      {
+        "tool": "multiply_numbers",
+        "arguments": {
+          "left": 120,
+          "right": 3
+        },
+        "result": 360
+      },
+      {
+        "tool": "subtract_numbers",
+        "arguments": {
+          "left": 360,
+          "right": 10
+        },
+        "result": 350
+      }
+    ],
+    "result": 350,
+    "call_count": 3,
+    "model_turn_count": 4
+  },
+  "learning_objectives": [
+    "Return actual tool outputs to the model.",
+    "Enforce bounded turns and a final message.",
+    "Execute one dependent tool per turn."
+  ]
+}

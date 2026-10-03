@@ -1,0 +1,74 @@
+{
+  "id": "004_dependent_tool_calls",
+  "name": "Dependent tool calls",
+  "description": "Dependent tool calls.",
+  "messages": [
+    {
+      "role": "user",
+      "content": "First calculate the area of a rectangle with width 8 units and height 5 units. Wait for that tool result. Then calculate 10 percent of the returned area. Do not calculate the percentage yourself, and do not request both tool calls at once."
+    }
+  ],
+  "tools": [
+    {
+      "name": "calculate_rectangle_area",
+      "description": "Calculate rectangle area.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "width": {
+            "type": "integer"
+          },
+          "height": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "width",
+          "height"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "calculate_percentage",
+      "description": "Calculate percentage.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "number"
+          },
+          "percentage": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "amount",
+          "percentage"
+        ],
+        "additionalProperties": false
+      }
+    }
+  ],
+  "expected": {
+    "steps": [
+      {
+        "tool": "calculate_rectangle_area",
+        "arguments": {
+          "width": 8,
+          "height": 5
+        },
+        "result": 40
+      },
+      {
+        "tool": "calculate_percentage",
+        "arguments": {
+          "amount": 40,
+          "percentage": 10
+        },
+        "result": 4.0
+      }
+    ],
+    "call_count": 2
+  }
+}

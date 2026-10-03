@@ -6,9 +6,7 @@ from agentic_code_bench.core.model import call_openai_model
 from agentic_code_bench.core.tool_execution import execute_tool_call
 
 CHALLENGE_PATH = (
-    Path(__file__).resolve().parents[3]
-    / "challenges"
-    / "001_single_tool.json"
+    Path(__file__).resolve().parents[3] / "challenges" / "001_single_tool.json"
 )
 
 
@@ -35,6 +33,8 @@ def solve(model: str = "gpt-5.6-luna") -> int | float:
 
     result = format_output(tool_execution["result"])
 
+    if not isinstance(result, (int, float)):
+        raise RuntimeError("Tool did not return a numeric result")
     return result
 
 

@@ -1,0 +1,56 @@
+{
+  "id": "006_tool_failure_handling",
+  "name": "Tool failure handling",
+  "description": "Tool failure handling.",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Use the division tool to divide 100 by 0. If the tool fails, do not retry it or call another tool. Explain the failure in a final message after receiving the tool error."
+    }
+  ],
+  "tools": [
+    {
+      "name": "divide_numbers",
+      "description": "Divide numbers.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "dividend": {
+            "type": "number"
+          },
+          "divisor": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "dividend",
+          "divisor"
+        ],
+        "additionalProperties": false
+      }
+    }
+  ],
+  "expected": {
+    "steps": [
+      {
+        "tool": "divide_numbers",
+        "arguments": {
+          "dividend": 100,
+          "divisor": 0
+        },
+        "status": "error",
+        "error_type": "ZeroDivisionError",
+        "error_message": "division by zero"
+      }
+    ],
+    "result": null,
+    "status": "failed",
+    "call_count": 1,
+    "model_turn_count": 2
+  },
+  "learning_objectives": [
+    "Return actual tool outputs to the model.",
+    "Enforce bounded turns and a final message.",
+    "Handle a real exception without retry."
+  ]
+}

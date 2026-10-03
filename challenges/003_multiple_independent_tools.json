@@ -1,0 +1,95 @@
+{
+  "id": "003_multiple_independent_tools",
+  "name": "Multiple independent calls",
+  "description": "Multiple independent calls.",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Find both the area and perimeter of a rectangle with width 8 units and height 5 units. Use the available tools for both calculations."
+    }
+  ],
+  "tools": [
+    {
+      "name": "calculate_triangle_area",
+      "description": "Calculate the area of a triangle.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "base": {
+            "type": "integer",
+            "description": "The base of the triangle."
+          },
+          "height": {
+            "type": "integer",
+            "description": "The height of the triangle."
+          }
+        },
+        "required": [
+          "base",
+          "height"
+        ]
+      }
+    },
+    {
+      "name": "calculate_rectangle_area",
+      "description": "Calculate rectangle area.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "width": {
+            "type": "integer"
+          },
+          "height": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "width",
+          "height"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "calculate_rectangle_perimeter",
+      "description": "Calculate rectangle perimeter.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "width": {
+            "type": "integer"
+          },
+          "height": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "width",
+          "height"
+        ],
+        "additionalProperties": false
+      }
+    }
+  ],
+  "expected": {
+    "calls": [
+      {
+        "tool": "calculate_rectangle_area",
+        "arguments": {
+          "width": 8,
+          "height": 5
+        },
+        "result": 40
+      },
+      {
+        "tool": "calculate_rectangle_perimeter",
+        "arguments": {
+          "width": 8,
+          "height": 5
+        },
+        "result": 26
+      }
+    ],
+    "call_count": 2
+  }
+}

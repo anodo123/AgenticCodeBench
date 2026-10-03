@@ -59,3 +59,9 @@ Desktop.ini
 
 # Local tooling files
 .pyright/
+
+# Optional model response debugging
+challenge_*_response.json
+
+# Workspace-local dependency cache
+.uv-cache/
