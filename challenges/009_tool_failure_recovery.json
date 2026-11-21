@@ -1,0 +1,47 @@
+{
+  "id": "009_tool_failure_recovery",
+  "name": "Order Delivery: Recover From Tool Failures",
+  "description": "Recover from transient tool failures using bounded retries, stop on permanent errors, and use the recovered order's tracking ID for a dependent carrier lookup.",
+  "learning_objectives": [
+    "Classify actual exceptions as transient or permanent.",
+    "Send structured success/error outputs to matching tool call IDs.",
+    "Let the model request retries while enforcing limits in application code.",
+    "Preserve state through previous_response_id.",
+    "Avoid dependent calls before their prerequisite succeeds.",
+    "Distinguish successful recovery from truthful terminal failure."
+  ],
+  "messages": [
+    {
+      "role": "user",
+      "content": "Find the delivery status of order ORD-1042 using get_order_status and then get_carrier_status with the tracking ID returned by the order tool. Never invent a tracking ID. If a tool reports a retryable error and retry_allowed is true, retry that same tool with the same arguments. Do not retry permanent errors or errors with retry_allowed false. Request at most one tool per response. After the carrier lookup succeeds, return only JSON with status completed and message describing the delivery status. If recovery is impossible, return only JSON with status failed and message explaining the actual error. Never claim success without the actual carrier result."
+    }
+  ],
+  "tools": [
+    {
+      "name": "get_order_status",
+      "description": "Look up an order and its carrier tracking ID. May fail temporarily or reject an unknown order.",
+      "parameters": {
+        "type": "object",
+        "properties": {"order_id": {"type": "string"}},
+        "required": ["order_id"]
+      }
+    },
+    {
+      "name": "get_carrier_status",
+      "description": "Look up delivery status for the tracking ID returned by get_order_status.",
+      "parameters": {
+        "type": "object",
+        "properties": {"tracking_id": {"type": "string"}},
+        "required": ["tracking_id"]
+      }
+    }
+  ],
+  "expected": {
+    "status": "completed",
+    "order_id": "ORD-1042",
+    "tracking_id": "TRK-1042",
+    "delivery_status": "out_for_delivery",
+    "call_count": 3,
+    "model_turn_count": 4
+  }
+}

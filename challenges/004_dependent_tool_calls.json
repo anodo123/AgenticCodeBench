@@ -1,7 +1,7 @@
 {
   "id": "004_dependent_tool_calls",
-  "name": "Dependent tool calls",
-  "description": "Dependent tool calls.",
+  "name": "Rectangle Area Percentage: Dependent Tool Calls",
+  "description": "Execute a tool, return its output to the model, then execute a dependent tool.",
   "messages": [
     {
       "role": "user",
@@ -11,42 +11,44 @@
   "tools": [
     {
       "name": "calculate_rectangle_area",
-      "description": "Calculate rectangle area.",
+      "description": "Calculate the area of a rectangle.",
       "parameters": {
         "type": "object",
         "properties": {
           "width": {
-            "type": "integer"
+            "type": "integer",
+            "description": "Rectangle width."
           },
           "height": {
-            "type": "integer"
+            "type": "integer",
+            "description": "Rectangle height."
           }
         },
         "required": [
           "width",
           "height"
-        ],
-        "additionalProperties": false
+        ]
       }
     },
     {
       "name": "calculate_percentage",
-      "description": "Calculate percentage.",
+      "description": "Calculate a percentage of an amount.",
       "parameters": {
         "type": "object",
         "properties": {
           "amount": {
-            "type": "number"
+            "type": "number",
+            "description": "Amount whose percentage is required."
           },
           "percentage": {
-            "type": "number"
+            "type": "number",
+            "description": "Percentage to calculate."
           }
         },
         "required": [
           "amount",
           "percentage"
-        ],
-        "additionalProperties": false
+        ]
       }
     }
   ],

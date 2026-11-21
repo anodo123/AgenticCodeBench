@@ -1,7 +1,7 @@
 {
   "id": "002_tool_selection",
-  "name": "Tool selection",
-  "description": "Tool selection.",
+  "name": "Rectangle Area: Tool Selection",
+  "description": "Select and execute exactly one correct tool from three candidates.",
   "messages": [
     {
       "role": "user",
@@ -32,42 +32,44 @@
     },
     {
       "name": "calculate_rectangle_area",
-      "description": "Calculate rectangle area.",
+      "description": "Calculate the area of a rectangle.",
       "parameters": {
         "type": "object",
         "properties": {
           "width": {
-            "type": "integer"
+            "type": "integer",
+            "description": "The width of the rectangle."
           },
           "height": {
-            "type": "integer"
+            "type": "integer",
+            "description": "The height of the rectangle."
           }
         },
         "required": [
           "width",
           "height"
-        ],
-        "additionalProperties": false
+        ]
       }
     },
     {
       "name": "calculate_rectangle_perimeter",
-      "description": "Calculate rectangle perimeter.",
+      "description": "Calculate the perimeter of a rectangle.",
       "parameters": {
         "type": "object",
         "properties": {
           "width": {
-            "type": "integer"
+            "type": "integer",
+            "description": "The width of the rectangle."
           },
           "height": {
-            "type": "integer"
+            "type": "integer",
+            "description": "The height of the rectangle."
           }
         },
         "required": [
           "width",
           "height"
-        ],
-        "additionalProperties": false
+        ]
       }
     }
   ],
@@ -77,7 +79,7 @@
       "width": 8,
       "height": 5
     },
-    "result": 40,
+    "output": 40,
     "call_count": 1
   }
 }

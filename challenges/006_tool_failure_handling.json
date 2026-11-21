@@ -1,7 +1,15 @@
 {
   "id": "006_tool_failure_handling",
-  "name": "Tool failure handling",
-  "description": "Tool failure handling.",
+  "name": "Division by Zero: Tool Failure Handling",
+  "description": "Learn to catch a real tool exception, report structured failure to the model, prevent a repeated failed call, and stop on the final response.",
+  "learning_objectives": [
+    "Catch exceptions at the tool-execution boundary without crashing solve().",
+    "Create failure evidence from the actual exception.",
+    "Return structured failure through the matching function call ID.",
+    "Keep model-turn and tool-attempt limits separate.",
+    "Reject retries after the configured tool-attempt limit.",
+    "Stop only on a valid final model message."
+  ],
   "messages": [
     {
       "role": "user",
@@ -11,22 +19,23 @@
   "tools": [
     {
       "name": "divide_numbers",
-      "description": "Divide numbers.",
+      "description": "Divide a dividend by a divisor.",
       "parameters": {
         "type": "object",
         "properties": {
           "dividend": {
-            "type": "number"
+            "type": "number",
+            "description": "Number to divide."
           },
           "divisor": {
-            "type": "number"
+            "type": "number",
+            "description": "Number to divide by."
           }
         },
         "required": [
           "dividend",
           "divisor"
-        ],
-        "additionalProperties": false
+        ]
       }
     }
   ],
@@ -47,10 +56,5 @@
     "status": "failed",
     "call_count": 1,
     "model_turn_count": 2
-  },
-  "learning_objectives": [
-    "Return actual tool outputs to the model.",
-    "Enforce bounded turns and a final message.",
-    "Handle a real exception without retry."
-  ]
+  }
 }

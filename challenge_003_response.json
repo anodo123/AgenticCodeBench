@@ -1,0 +1,200 @@
+{
+  "id": "resp_0cfa2544a0d04010006ab3e104cf0087d28aef36241eb428d8",
+  "created_at": 1790173444.0,
+  "error": null,
+  "incomplete_details": null,
+  "instructions": null,
+  "metadata": {},
+  "model": "gpt-5.6-luna",
+  "object": "response",
+  "output": [
+    {
+      "id": "rs_0cfa2544a0d04010006ab3e105b17087d2b39d0db2a5499070",
+      "summary": [],
+      "type": "reasoning",
+      "content": [],
+      "encrypted_content": "gAAAAABqs-EG8WTobVFrtiTTf8869qsanY2GskWcvANXnkSrFEipiBf7Dq9Ik0M9it_HRsr_cWNKi0tnLSJe5aMJ2TVA4J6e1cAr9VTRhA0tq4h15kNkcjgVh72WGvEjHFbJ4nMpe94WzFxVFDRxKTBBXKmEs3tX2fxqCoIX82i-w360t7dmAr7xej5_j3IzL_3NFjCUOIsEaaviKwnGID6pnpgLbl89TapfJlel_iExioMdsKDAgPxnRKcPa5yAylh66TbjfqLj2Rl-qf4JywE1YhRRPwHjiTYzC45R6HHhcjr-SdP96Uv85U4RT7yKkrCV9ZgbDCxjQKzhRUIxwy30x_LaEH-QhfZa0Rfi9dzYnaFk6DkNwjuvkh8YQJNFmh9x8Gg5grLDyUomTrgVJtTNCzLKMXukuNtBmla3nlSocQD2beIenz8xchc2Lzf7VeWpk1Qio2Iu-SeZK6PiLjeJS97LP2HuuME2PG7JgLm6afAqvFj2j6yJrKG5F1n298YecPCC0V-aERZL85nlvq1Qeh5TOaImXpkYmYytYQTEROhhMtCjg1qFZfMuJ5V318gL6uJE84bOLf1FAgl6wfyY3HcvOmtvT_V6iKiu73qlL589XStrrsBYLFMTv9T269lm-Ewei-jI_Nud9WtTX9i1stXKTeVXPwNQ4-Za5S-M3ObpbujuauBuwa-43xxu2cwPeIDqEhuDAEWwRKUBF3Mdjil6g1kFWqVzwemfwsObAluT7_S4rTjSivFpNoMewN9xdhN6VRFlYsPuazZnbyYdGOORsr1ezO2NaX3sfsUSB9lejKQ-JLwLPy1JvnkPtAQ6rrNP1h6uyegt1f_idytvREe1Tq_8pqVz1G9JXbW9n05H_gndI3Auz_OZ-CZqERstI2-2FzRzcWZd7X0_ADtLru7VwyfueUfOFA0E5DxWuRPwYZxnJVSArcaQV90_YrpU0UOdbMt3oZarD4XvhkpnhaFNdOTfSdGTQGn9UT35UHbIk374Deq6sR3IZcEa7m6kzh-6l--Pp509Jc6RQr-cdVfzgSvsiIk0gGNoH1cDNHUyuFSEHQG7PfaKjm3l61bYoilt1aJSDKa6xy9RkwXX9igSZ1uk8cFWWV4qNGrZSUpFRU989Kxgqw2J1QHNQn3Bk8_6r6HeudH4Q58hphz0mjkgfeoOzXjtIptyzukTB8x5w9TbzamN0iZh1Oi_QWiMl_9oLTsB",
+      "status": null
+    },
+    {
+      "arguments": "{\"width\":8,\"height\":5}",
+      "call_id": "call_AIlddUbMelurPll1J6GyN5Q1",
+      "name": "calculate_rectangle_area",
+      "type": "function_call",
+      "id": "fc_0cfa2544a0d04010006ab3e106523487d29aad268713aead02",
+      "async_": null,
+      "caller": null,
+      "namespace": null,
+      "status": "completed"
+    },
+    {
+      "arguments": "{\"width\":8,\"height\":5}",
+      "call_id": "call_aXjkInIHWZClzIAaBEWcdDRk",
+      "name": "calculate_rectangle_perimeter",
+      "type": "function_call",
+      "id": "fc_0cfa2544a0d04010006ab3e106524487d28ff3a5179fbd6ade",
+      "async_": null,
+      "caller": null,
+      "namespace": null,
+      "status": "completed"
+    }
+  ],
+  "parallel_tool_calls": true,
+  "temperature": 1.0,
+  "tool_choice": "auto",
+  "tools": [
+    {
+      "name": "calculate_triangle_area",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "base": {
+            "type": "integer",
+            "description": "The base of the triangle."
+          },
+          "height": {
+            "type": "integer",
+            "description": "The height of the triangle."
+          }
+        },
+        "required": [
+          "base",
+          "height"
+        ],
+        "additionalProperties": false
+      },
+      "strict": true,
+      "type": "function",
+      "allowed_callers": null,
+      "async_": null,
+      "defer_loading": null,
+      "description": "Calculate the area of a triangle.",
+      "output_schema": null
+    },
+    {
+      "name": "calculate_rectangle_area",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "width": {
+            "type": "integer",
+            "description": "The width of the rectangle."
+          },
+          "height": {
+            "type": "integer",
+            "description": "The height of the rectangle."
+          }
+        },
+        "required": [
+          "width",
+          "height"
+        ],
+        "additionalProperties": false
+      },
+      "strict": true,
+      "type": "function",
+      "allowed_callers": null,
+      "async_": null,
+      "defer_loading": null,
+      "description": "Calculate the area of a rectangle.",
+      "output_schema": null
+    },
+    {
+      "name": "calculate_rectangle_perimeter",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "width": {
+            "type": "integer",
+            "description": "The width of the rectangle."
+          },
+          "height": {
+            "type": "integer",
+            "description": "The height of the rectangle."
+          }
+        },
+        "required": [
+          "width",
+          "height"
+        ],
+        "additionalProperties": false
+      },
+      "strict": true,
+      "type": "function",
+      "allowed_callers": null,
+      "async_": null,
+      "defer_loading": null,
+      "description": "Calculate the perimeter of a rectangle.",
+      "output_schema": null
+    }
+  ],
+  "top_p": 0.98,
+  "background": false,
+  "completed_at": 1790173446.0,
+  "conversation": null,
+  "max_output_tokens": null,
+  "max_tool_calls": null,
+  "moderation": null,
+  "previous_response_id": null,
+  "prompt": null,
+  "prompt_cache_diagnostics": null,
+  "prompt_cache_key": null,
+  "prompt_cache_options": null,
+  "prompt_cache_retention": "24h",
+  "reasoning": {
+    "context": "all_turns",
+    "effort": "medium",
+    "generate_summary": null,
+    "mode": "standard",
+    "summary": null
+  },
+  "safety_identifier": null,
+  "service_tier": "default",
+  "status": "completed",
+  "text": {
+    "format": {
+      "type": "text"
+    },
+    "verbosity": "medium"
+  },
+  "top_logprobs": 0,
+  "truncation": "disabled",
+  "usage": {
+    "input_tokens": 168,
+    "input_tokens_details": {
+      "cache_write_tokens": 0,
+      "cached_tokens": 0
+    },
+    "output_tokens": 72,
+    "output_tokens_details": {
+      "reasoning_tokens": 11
+    },
+    "total_tokens": 240
+  },
+  "user": null,
+  "access_programs": null,
+  "billing": {
+    "payer": "developer"
+  },
+  "frequency_penalty": 0.0,
+  "presence_penalty": 0.0,
+  "store": true,
+  "tool_usage": {
+    "image_gen": {
+      "input_tokens": 0,
+      "input_tokens_details": {
+        "image_tokens": 0,
+        "text_tokens": 0
+      },
+      "output_tokens": 0,
+      "output_tokens_details": {
+        "image_tokens": 0,
+        "text_tokens": 0
+      },
+      "total_tokens": 0
+    },
+    "web_search": {
+      "num_requests": 0
+    }
+  }
+}

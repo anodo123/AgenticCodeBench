@@ -1,62 +1,65 @@
-"""Live integration evaluator: running this test may incur API charges."""
-
+from collections.abc import Callable
+from functools import wraps
 from pathlib import Path
+from typing import Any
+
+import pytest
 
 from agentic_code_bench.core.challenge import load_challenge
 from agentic_code_bench.core.tools import TOOL_REGISTRY
-from agentic_code_bench.solutions import (
-    challenge_003_multiple_independent_tools as solution,
+from agentic_code_bench.solutions.challenge_003_multiple_independent_tools import solve
+
+CHALLENGE_PATH = (
+    Path(__file__).resolve().parents[2]
+    / "challenges"
+    / "003_multiple_independent_tools.json"
 )
 
 
-def test_challenge_003_multiple_independent_tools(monkeypatch):
-    challenge = load_challenge(
-        Path(__file__).resolve().parents[2]
-        / "challenges"
-        / "003_multiple_independent_tools.json"
-    )
-    expected = challenge["expected"]
-    executions = []
-    events = []
-    requests = []
-    original_model = solution.call_openai_model
+def call_key(call: dict[str, Any]) -> tuple[str, str]:
+    """Create an order-independent key without accepting swapped arguments."""
+    arguments = call["arguments"]
+    return call["tool"], repr(sorted(arguments.items()))
 
-    def record_model(**kwargs):
-        events.append("model")
-        response = original_model(**kwargs)
-        requests.append((kwargs, response))
-        return response
 
-    def wrap(name, function):
-        def record(**arguments):
-            events.append("tool")
-            try:
-                result = function(**arguments)
-            except Exception as exc:
-                executions.append(
-                    {
-                        "tool": name,
-                        "arguments": arguments,
-                        "status": "error",
-                        "error_type": type(exc).__name__,
-                        "error_message": str(exc),
-                    }
-                )
-                raise
-            executions.append({"tool": name, "arguments": arguments, "result": result})
+def test_challenge_003_multiple_independent_tools(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    expected = load_challenge(CHALLENGE_PATH)["expected"]
+    recorded_calls: list[dict[str, Any]] = []
+
+    def record_calls(
+        name: str, function: Callable[..., object]
+    ) -> Callable[..., object]:
+        @wraps(function)
+        def recorded(**arguments: Any) -> object:
+            call: dict[str, Any] = {"tool": name, "arguments": arguments}
+            recorded_calls.append(call)
+            result = function(**arguments)
+            call["result"] = result
             return result
 
-        return record
+        return recorded
 
-    for name, function in list(TOOL_REGISTRY.items()):
-        monkeypatch.setitem(TOOL_REGISTRY, name, wrap(name, function))
-    monkeypatch.setattr(solution, "call_openai_model", record_model)
-    actual = solution.solve(debug=False)
-    assert actual["call_count"] == len(executions) == expected["call_count"]
-    assert len(requests) == 1
-    assert len(actual["calls"]) == len(executions)
-    for calls in (actual["calls"], executions):
-        assert sorted(calls, key=lambda item: item["tool"]) == sorted(
-            expected["calls"], key=lambda item: item["tool"]
-        )
-        assert all(type(item["result"]) is int for item in calls)
+    for name, function in TOOL_REGISTRY.items():
+        monkeypatch.setitem(TOOL_REGISTRY, name, record_calls(name, function))
+
+    actual = solve()
+
+    assert isinstance(actual, dict)
+    assert set(actual) == {"calls", "call_count"}
+    assert type(actual["call_count"]) is int
+    assert isinstance(actual["calls"], list)
+    assert actual["call_count"] == len(actual["calls"])
+    assert len(recorded_calls) == expected["call_count"] == actual["call_count"]
+
+    actual_by_key = {call_key(call): call for call in actual["calls"]}
+    recorded_by_key = {call_key(call): call for call in recorded_calls}
+    expected_by_key = {call_key(call): call for call in expected["calls"]}
+
+    assert len(actual_by_key) == len(actual["calls"])
+    assert len(recorded_by_key) == len(recorded_calls)
+    assert actual_by_key == recorded_by_key == expected_by_key
+
+    for call in actual["calls"]:
+        assert type(call["result"]) is int

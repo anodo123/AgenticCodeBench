@@ -1,0 +1,96 @@
+{
+  "id": "010_safe_money_transfer",
+  "name": "Safe Money Transfer After an Ambiguous Failure",
+  "description": "Preview a transfer, obtain explicit user approval, execute it exactly once, and reconcile an ambiguous timeout without duplicating the side effect.",
+  "learning_objectives": [
+    "Separate read-only planning from state-changing execution.",
+    "Require explicit user approval before a financial side effect.",
+    "Generate and enforce an application-owned idempotency key.",
+    "Treat a timeout after execution as an unknown outcome rather than a definite failure.",
+    "Reconcile an ambiguous outcome through a read-only lookup instead of blindly retrying.",
+    "Verify final state before reporting successful completion.",
+    "Bound model turns, tool attempts, and financial side effects independently."
+  ],
+  "messages": [
+    {
+      "role": "user",
+      "content": "Transfer 2500 rupees (250000 paise) from WALLET-A to WALLET-B. First check the source balance and create a transfer preview. Show me the fee and total debit, then ask for my explicit confirmation before executing anything that moves money. Request at most one tool per response. When asking for confirmation, return only JSON with status needs_confirmation and a message containing the amount, fee, and total debit. If I decline, return only JSON with status cancelled and a message confirming that no transfer occurred. If I approve, use only the application-provided idempotency key. The execution response may be lost after the transfer commits; if the result is ambiguous, do not execute it again. Reconcile with lookup_transfer_by_idempotency_key using the same key. Return status completed only after a verified completed transfer record is available. Final answers must be JSON with status and message."
+    }
+  ],
+  "tools": [
+    {
+      "name": "get_wallet_balance",
+      "description": "Return the current balance of a wallet in paise.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "wallet_id": {"type": "string"}
+        },
+        "required": ["wallet_id"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "create_transfer_preview",
+      "description": "Validate a proposed transfer and return its fee and total debit without moving money.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "source_wallet_id": {"type": "string"},
+          "destination_wallet_id": {"type": "string"},
+          "transfer_amount_paise": {"type": "integer"}
+        },
+        "required": [
+          "source_wallet_id",
+          "destination_wallet_id",
+          "transfer_amount_paise"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "execute_transfer",
+      "description": "Execute an approved preview once using the application-provided idempotency key.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "preview_id": {"type": "string"},
+          "idempotency_key": {"type": "string"}
+        },
+        "required": ["preview_id", "idempotency_key"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "lookup_transfer_by_idempotency_key",
+      "description": "Read the authoritative transfer record associated with an idempotency key.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "idempotency_key": {"type": "string"}
+        },
+        "required": ["idempotency_key"],
+        "additionalProperties": false
+      }
+    }
+  ],
+  "expected": {
+    "status": "completed",
+    "source_wallet_id": "WALLET-A",
+    "destination_wallet_id": "WALLET-B",
+    "transfer_amount_paise": 250000,
+    "service_fee_paise": 2500,
+    "source_total_debit_paise": 252500,
+    "destination_credit_paise": 250000,
+    "transfer_status": "completed",
+    "ordered_tools": [
+      "get_wallet_balance",
+      "create_transfer_preview",
+      "execute_transfer",
+      "lookup_transfer_by_idempotency_key"
+    ],
+    "call_count": 4,
+    "side_effect_count": 1,
+    "model_turn_count": 6
+  }
+}

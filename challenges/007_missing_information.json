@@ -1,0 +1,47 @@
+{
+  "id": "007_missing_information",
+  "name": "Rectangle Area: Missing Information",
+  "description": "Recognize that a required tool argument is missing, avoid inventing it, and return the model's clarification request without executing a tool.",
+  "learning_objectives": [
+    "Treat zero tool calls plus a valid clarification message as needs_input.",
+    "Reject tool calls that rely on invented required arguments.",
+    "Distinguish needs_input from completed and failed states.",
+    "Return model-generated clarification text without using expected data.",
+    "Verify that no registered tool was executed."
+  ],
+  "messages": [
+    {
+      "role": "user",
+      "content": "Find the area of a rectangle with width 8 units. If required information is missing, do not invent it and ask me for it before calling any tool."
+    }
+  ],
+  "tools": [
+    {
+      "name": "calculate_rectangle_area",
+      "description": "Calculate the area of a rectangle.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "width": {
+            "type": "integer",
+            "description": "The width of the rectangle."
+          },
+          "height": {
+            "type": "integer",
+            "description": "The height of the rectangle."
+          }
+        },
+        "required": [
+          "width",
+          "height"
+        ]
+      }
+    }
+  ],
+  "expected": {
+    "status": "needs_input",
+    "missing_field": "height",
+    "call_count": 0,
+    "model_turn_count": 1
+  }
+}

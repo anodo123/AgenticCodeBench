@@ -1,0 +1,144 @@
+{
+  "id": "014_multi_cause_incident_diagnosis",
+  "name": "Multi-Cause Incident Diagnosis and Evidence-Based Replanning",
+  "description": "Investigate competing production-incident hypotheses, execute one human-authorized remediation, verify partial recovery, and replan toward a remaining downstream cause.",
+  "learning_objectives": [
+    "Distinguish incident symptoms, correlation, supported causal hypotheses, and verified recovery.",
+    "Compare rolling-deployment versions with normalized measurements from the same cohort.",
+    "Gate privacy-sensitive workload inspection with deterministic database-health evidence.",
+    "Keep incident facts, telemetry sources, and approval records outside model-controlled arguments.",
+    "Bind human authorization to one incident snapshot, observation, and exact remediation action.",
+    "Verify user-facing recovery across sustained post-remediation windows.",
+    "Reopen competing hypotheses after partial subsystem recovery instead of declaring success.",
+    "Escalate truthfully when an external supported cause keeps the API unhealthy."
+  ],
+  "messages": [
+    {
+      "role": "user",
+      "content": "Investigate incident INC-014. The application owns an immutable incident snapshot and all authoritative evidence. Request at most one tool per response. First call get_incident_details. Then test the deployment hypothesis, inspect database health, and inspect database workloads in that order. Do not claim causation from timing alone and do not invent evidence references. When a supported workload requires remediation, stop calling tools and respond only with JSON containing status needs_approval and a non-empty message that explains the evidence, read/write operation type, resource impact, proposed action, and interruption risk. The application will collect a human decision and provide an immutable authorization. Only then may you call execute_workload_remediation with the exact authorized observation, action, and authorization ID. After execution, call verify_remediation_outcome with the returned remediation execution ID. A recovered database does not prove incident resolution: if the API remains unhealthy, call investigate_downstream_dependency_issue using that same execution ID. If it supports an external dependency as the remaining cause and no further authorized local remediation exists, finish with JSON containing status escalated and a non-empty message. Never expose raw SQL, log text, request payloads, credentials, or customer data."
+    }
+  ],
+  "tools": [
+    {
+      "name": "get_incident_details",
+      "description": "Return API symptoms and a historical healthy baseline from the bound incident snapshot.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "incident_id": {"type": "string"}
+        },
+        "required": ["incident_id"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "diagnose_deployment_changes",
+      "description": "Compare old and new versions in a matched rolling-deployment cohort using trusted evidence.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "incident_id": {"type": "string"}
+        },
+        "required": ["incident_id"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "inspect_database_health",
+      "description": "Return aligned database latency, pressure, data-quality, and timing measurements.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "incident_id": {"type": "string"}
+        },
+        "required": ["incident_id"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "inspect_database_workloads",
+      "description": "After the deterministic health gate passes, return sanitized suspected workload observations without raw SQL or customer data.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "incident_id": {"type": "string"}
+        },
+        "required": ["incident_id"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "execute_workload_remediation",
+      "description": "Execute only the exact workload action allowed by an application-owned human authorization.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "observation_id": {"type": "string"},
+          "proposed_action": {
+            "type": "string",
+            "enum": ["terminate", "pause", "throttle"]
+          },
+          "authorization_id": {"type": "string"}
+        },
+        "required": [
+          "observation_id",
+          "proposed_action",
+          "authorization_id"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "verify_remediation_outcome",
+      "description": "Measure sustained database and API recovery after one exact remediation execution.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "incident_id": {"type": "string"},
+          "remediation_execution_id": {"type": "string"}
+        },
+        "required": ["incident_id", "remediation_execution_id"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "investigate_downstream_dependency_issue",
+      "description": "Inspect registered downstream dependencies after verified partial recovery and return sanitized causal evidence.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "incident_id": {"type": "string"},
+          "remediation_execution_id": {"type": "string"}
+        },
+        "required": ["incident_id", "remediation_execution_id"],
+        "additionalProperties": false
+      }
+    }
+  ],
+  "expected": {
+    "status": "escalated",
+    "incident_id": "INC-014",
+    "deployment_hypothesis_state": "rejected",
+    "database_hypothesis_state": "supported",
+    "supported_observation_id": "OBS-JOB-014",
+    "authorization_decision": "approved",
+    "approved_action": "terminate",
+    "recovery_state": "partial",
+    "downstream_hypothesis_state": "supported",
+    "supported_dependency_id": "bedrock-runtime",
+    "ordered_executed_tools": [
+      "get_incident_details",
+      "diagnose_deployment_changes",
+      "inspect_database_health",
+      "inspect_database_workloads",
+      "execute_workload_remediation",
+      "verify_remediation_outcome",
+      "investigate_downstream_dependency_issue"
+    ],
+    "call_count": 7,
+    "approval_count": 1,
+    "remediation_execution_count": 1,
+    "minimum_model_turn_count": 9,
+    "maximum_model_turn_count": 9
+  }
+}

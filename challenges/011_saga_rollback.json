@@ -1,0 +1,154 @@
+{
+  "id": "011_saga_rollback",
+  "name": "Trip Booking Saga With Verified Rollback",
+  "description": "Coordinate flight and hotel bookings, compensate a partial success after a permanent failure, and reconcile an ambiguous rollback.",
+  "learning_objectives": [
+    "Build a saga from forward actions and compensating actions.",
+    "Calculate a plan from actual quote results before requesting approval.",
+    "Generate separate application-owned idempotency keys for each side effect.",
+    "Classify a permanent downstream failure without retrying it.",
+    "Compensate successful actions in reverse order after partial failure.",
+    "Treat a timeout during compensation as an unknown outcome.",
+    "Verify rollback before returning rolled_back.",
+    "Return manual_intervention when a safe terminal state cannot be verified."
+  ],
+  "messages": [
+    {
+      "role": "user",
+      "content": "Book flight F-204 and hotel H-88 for two nights, but only if the combined price is at most 30000 rupees (3000000 paise). Fetch the actual flight price and hotel nightly price. Use calculate_hotel_stay_total with the quoted nightly price and requested nights, then calculate the trip total from the actual flight and hotel totals before asking for my explicit confirmation. Request at most one tool per response. When asking for confirmation, return only JSON with status needs_confirmation and a message containing the flight price, hotel price, total price, and budget. If I decline, return only JSON with status cancelled and confirm that no booking was attempted. After approval, use only the separate application-provided idempotency keys for the flight reservation, hotel reservation, and flight cancellation. If one reservation succeeds and the next fails permanently, do not retry the permanent failure. Compensate every successful booking in reverse order. A cancellation response may be lost after cancellation commits; do not cancel again. Reconcile it with lookup_flight_booking. Return only JSON with status rolled_back after proving that no partial booking remains. Return status manual_intervention if rollback cannot be verified. Never return completed unless both reservations actually succeed."
+    }
+  ],
+  "tools": [
+    {
+      "name": "get_flight_quote",
+      "description": "Return current availability and price in paise for a flight.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "flight_id": {"type": "string"}
+        },
+        "required": ["flight_id"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "get_hotel_quote",
+      "description": "Return current availability and nightly price in paise for a hotel.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "hotel_id": {"type": "string"},
+          "nights": {"type": "integer"}
+        },
+        "required": ["hotel_id", "nights"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "calculate_hotel_stay_total",
+      "description": "Multiply the actual nightly hotel price by the requested number of nights.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "nightly_price_paise": {"type": "integer"},
+          "nights": {"type": "integer"}
+        },
+        "required": ["nightly_price_paise", "nights"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "calculate_trip_total",
+      "description": "Add the actual flight and hotel quote prices in paise.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "flight_price_paise": {"type": "integer"},
+          "hotel_price_paise": {"type": "integer"}
+        },
+        "required": ["flight_price_paise", "hotel_price_paise"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "reserve_flight",
+      "description": "Reserve the quoted flight using its application-provided idempotency key.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "flight_id": {"type": "string"},
+          "idempotency_key": {"type": "string"}
+        },
+        "required": ["flight_id", "idempotency_key"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "reserve_hotel",
+      "description": "Reserve the quoted hotel stay using its application-provided idempotency key.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "hotel_id": {"type": "string"},
+          "nights": {"type": "integer"},
+          "idempotency_key": {"type": "string"}
+        },
+        "required": ["hotel_id", "nights", "idempotency_key"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "cancel_flight",
+      "description": "Compensate a confirmed flight booking using an application-provided compensation key.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "booking_id": {"type": "string"},
+          "compensation_key": {"type": "string"}
+        },
+        "required": ["booking_id", "compensation_key"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "lookup_flight_booking",
+      "description": "Return the authoritative current state of a flight booking.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "booking_id": {"type": "string"}
+        },
+        "required": ["booking_id"],
+        "additionalProperties": false
+      }
+    }
+  ],
+  "expected": {
+    "status": "rolled_back",
+    "flight_id": "F-204",
+    "hotel_id": "H-88",
+    "nights": 2,
+    "flight_price_paise": 1800000,
+    "nightly_price_paise": 400000,
+    "hotel_price_paise": 800000,
+    "total_price_paise": 2600000,
+    "budget_paise": 3000000,
+    "flight_status": "cancelled",
+    "hotel_status": "not_booked",
+    "trip_status": "rolled_back",
+    "ordered_tools": [
+      "get_flight_quote",
+      "get_hotel_quote",
+      "calculate_hotel_stay_total",
+      "calculate_trip_total",
+      "reserve_flight",
+      "reserve_hotel",
+      "cancel_flight",
+      "lookup_flight_booking"
+    ],
+    "call_count": 8,
+    "forward_action_count": 2,
+    "compensation_count": 1,
+    "model_turn_count": 10
+  }
+}

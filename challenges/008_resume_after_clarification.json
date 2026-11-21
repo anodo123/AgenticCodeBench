@@ -1,0 +1,66 @@
+{
+  "id": "008_resume_after_clarification",
+  "name": "Interactive Agent Loop: Clarification and Dependent Tools",
+  "description": "Build a bounded interactive loop that asks for missing inputs, resumes with user replies, executes dependent tools, and recognizes completion.",
+  "learning_objectives": [
+    "Route each response to tool execution, user clarification, or completion.",
+    "Preserve conversation state with previous_response_id.",
+    "Ask the real user for missing information inside a loop.",
+    "Use actual tool results as inputs for dependent calculations.",
+    "Enforce model-turn and tool-call limits.",
+    "Handle exhausted user input and tool failures explicitly."
+  ],
+  "messages": [
+    {
+      "role": "user",
+      "content": "Calculate a rectangle's area and then add a waste allowance to get the total material required. Width is 5 units. Height and waste percentage are missing: ask for height first, and only after I answer ask for the waste percentage. Never invent either value. Use calculate_rectangle_area, then calculate_percentage on the actual area, then add_numbers to add the actual area and allowance. Request at most one tool per response. When you are asking a question rather than calling a tool, return only JSON with status needs_input and message containing your question. When all calculations are finished, return only JSON with status completed and message containing your final answer. Do not claim completion until all three tools have returned results."
+    }
+  ],
+  "tools": [
+    {
+      "name": "calculate_rectangle_area",
+      "description": "Calculate the area of a rectangle.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "width": {"type": "integer"},
+          "height": {"type": "integer"}
+        },
+        "required": ["width", "height"]
+      }
+    },
+    {
+      "name": "calculate_percentage",
+      "description": "Calculate a percentage of an amount.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "amount": {"type": "number"},
+          "percentage": {"type": "number"}
+        },
+        "required": ["amount", "percentage"]
+      }
+    },
+    {
+      "name": "add_numbers",
+      "description": "Add two numbers.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "left": {"type": "number"},
+          "right": {"type": "number"}
+        },
+        "required": ["left", "right"]
+      }
+    }
+  ],
+  "example_user_replies": ["The height is 3 units.", "Use 10 percent waste."],
+  "expected": {
+    "example_only": true,
+    "status": "completed",
+    "ordered_tools": ["calculate_rectangle_area", "calculate_percentage", "add_numbers"],
+    "results": [15, 1.5, 16.5],
+    "call_count": 3,
+    "clarification_count": 2
+  }
+}

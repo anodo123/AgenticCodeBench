@@ -1,7 +1,7 @@
 {
   "id": "003_multiple_independent_tools",
-  "name": "Multiple independent calls",
-  "description": "Multiple independent calls.",
+  "name": "Rectangle Area and Perimeter: Multiple Independent Tools",
+  "description": "Select and execute exactly two independent tool calls.",
   "messages": [
     {
       "role": "user",
@@ -32,42 +32,44 @@
     },
     {
       "name": "calculate_rectangle_area",
-      "description": "Calculate rectangle area.",
+      "description": "Calculate the area of a rectangle.",
       "parameters": {
         "type": "object",
         "properties": {
           "width": {
-            "type": "integer"
+            "type": "integer",
+            "description": "The width of the rectangle."
           },
           "height": {
-            "type": "integer"
+            "type": "integer",
+            "description": "The height of the rectangle."
           }
         },
         "required": [
           "width",
           "height"
-        ],
-        "additionalProperties": false
+        ]
       }
     },
     {
       "name": "calculate_rectangle_perimeter",
-      "description": "Calculate rectangle perimeter.",
+      "description": "Calculate the perimeter of a rectangle.",
       "parameters": {
         "type": "object",
         "properties": {
           "width": {
-            "type": "integer"
+            "type": "integer",
+            "description": "The width of the rectangle."
           },
           "height": {
-            "type": "integer"
+            "type": "integer",
+            "description": "The height of the rectangle."
           }
         },
         "required": [
           "width",
           "height"
-        ],
-        "additionalProperties": false
+        ]
       }
     }
   ],

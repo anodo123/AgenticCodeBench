@@ -1,0 +1,104 @@
+{
+  "id": "012_approval_invalidation",
+  "name": "Approval Invalidation After a Price Change",
+  "description": "Invalidate approval after an expired quote, obtain fresh approval for the revised plan, and reconcile an ambiguous purchase.",
+  "learning_objectives": [
+    "Bind user approval to an exact quote, quantity, fees, and total.",
+    "Invalidate approval when any material plan value changes.",
+    "Store permanent failures under their original idempotency keys.",
+    "Use a fresh idempotency key for a newly approved purchase intent.",
+    "Distinguish a stale-plan conflict from an ambiguous committed purchase.",
+    "Reconcile a timed-out purchase without repeating it.",
+    "Stop with manual_intervention when a committed purchase cannot be verified."
+  ],
+  "messages": [
+    {
+      "role": "user",
+      "content": "Purchase three tickets for event EVT-901 only if the final cost is at most 18000 rupees (1800000 paise). Fetch the current versioned quote and use calculate_ticket_total with the actual unit price and quantity before asking for explicit confirmation. Request at most one tool per response. When asking for confirmation, return only JSON with status needs_confirmation and a message containing the event, quote ID, quantity, unit price, fees, total, and budget. After approval, use only an application-provided idempotency key. The first approved quote expires when purchase is attempted and no tickets are purchased. Do not retry it. Fetch the revised quote, recalculate the plan, invalidate the old approval, and ask for fresh approval if the revised total remains within budget. Use a fresh application-provided idempotency key for the newly approved quote. The second purchase commits before its response times out. Do not purchase again. Reconcile it with lookup_purchase_by_idempotency_key. Return only JSON with status completed after verifying exactly three tickets at the newly approved price. Return over_budget without purchasing if a plan exceeds the budget, cancelled if the user declines, and manual_intervention if the final purchase cannot be verified."
+    }
+  ],
+  "tools": [
+    {
+      "name": "get_ticket_quote",
+      "description": "Return the provider's current versioned unit-price quote for an event.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "event_id": {"type": "string"}
+        },
+        "required": ["event_id"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "calculate_ticket_total",
+      "description": "Calculate ticket subtotal, fixed per-ticket fees, and final total in paise.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "unit_price_paise": {"type": "integer"},
+          "quantity": {"type": "integer"}
+        },
+        "required": ["unit_price_paise", "quantity"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "purchase_tickets",
+      "description": "Purchase tickets against one exact quote and idempotency key.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "quote_id": {"type": "string"},
+          "quantity": {"type": "integer"},
+          "idempotency_key": {"type": "string"}
+        },
+        "required": ["quote_id", "quantity", "idempotency_key"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "lookup_purchase_by_idempotency_key",
+      "description": "Return the authoritative purchase created by an idempotency key.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "idempotency_key": {"type": "string"}
+        },
+        "required": ["idempotency_key"],
+        "additionalProperties": false
+      }
+    }
+  ],
+  "expected": {
+    "status": "completed",
+    "event_id": "EVT-901",
+    "quantity": 3,
+    "budget_paise": 1800000,
+    "initial_quote_id": "QUOTE-001",
+    "initial_unit_price_paise": 500000,
+    "initial_subtotal_paise": 1500000,
+    "initial_fee_paise": 90000,
+    "initial_total_price_paise": 1590000,
+    "revised_quote_id": "QUOTE-002",
+    "revised_unit_price_paise": 550000,
+    "revised_subtotal_paise": 1650000,
+    "revised_fee_paise": 90000,
+    "revised_total_price_paise": 1740000,
+    "purchase_status": "completed",
+    "ordered_tools": [
+      "get_ticket_quote",
+      "calculate_ticket_total",
+      "purchase_tickets",
+      "get_ticket_quote",
+      "calculate_ticket_total",
+      "purchase_tickets",
+      "lookup_purchase_by_idempotency_key"
+    ],
+    "call_count": 7,
+    "purchase_attempt_count": 2,
+    "committed_purchase_count": 1,
+    "approval_count": 2,
+    "model_turn_count": 10
+  }
+}
